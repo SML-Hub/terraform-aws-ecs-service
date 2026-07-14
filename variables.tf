@@ -88,11 +88,11 @@ variable "additional_load_balancers" {
 
 variable "service_connect" {
   type = object({
-    enabled = optional(bool, false)
-    type    = optional(string, "client-only")
-    port    = optional(number, 80)
-    name    = optional(string, "service")
-    timeout = optional(number, 15)
+    enabled     = optional(bool, false)
+    type        = optional(string, "client-only")
+    port        = optional(number, 80)
+    name        = optional(string, "service")
+    timeout     = optional(number, 15)
     appProtocol = optional(string, "http")
     additional_ports = optional(list(object({
       name        = string
@@ -287,6 +287,30 @@ variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
   default     = {}
+}
+
+variable "efs" {
+  description = <<-EOT
+    Optional persistent EFS storage for the service. When enabled, creates an
+    encrypted EFS filesystem, one mount target per subnet, a security group
+    allowing NFS (TCP 2049) from the service security groups, and an access
+    point. Expose the outputs `efs_file_system_id` / `efs_access_point_id` to
+    your deploy pipeline to mount it into the container. Note: this module does
+    NOT add the volume to the task definition (task_definition has
+    ignore_changes = all and is driven by the deploy pipeline).
+  EOT
+  type = object({
+    enabled          = optional(bool, false)
+    root_directory   = optional(string, "/")
+    posix_uid        = optional(number, 0)
+    posix_gid        = optional(number, 0)
+    permissions      = optional(string, "0755")
+    encrypted        = optional(bool, true)
+    performance_mode = optional(string, "generalPurpose")
+    throughput_mode  = optional(string, "bursting")
+    transition_to_ia = optional(string, null)
+  })
+  default = {}
 }
 
 variable "initial_role" {
