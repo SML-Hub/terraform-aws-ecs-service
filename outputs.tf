@@ -32,7 +32,7 @@ output "cloudflare_records" {
   value = {
     main_record = var.application_load_balancer.enabled && var.application_load_balancer.cloudflare_zone_id != "" && var.application_load_balancer.host != "" ? {
       name    = cloudflare_record.main_alb_record[0].name
-      value = cloudflare_record.main_alb_record[0].value
+      value   = cloudflare_record.main_alb_record[0].value
       zone_id = cloudflare_record.main_alb_record[0].zone_id
       proxied = cloudflare_record.main_alb_record[0].proxied
       type    = cloudflare_record.main_alb_record[0].type
@@ -40,11 +40,26 @@ output "cloudflare_records" {
     additional_records = {
       for idx, record in cloudflare_record.additional_alb_records : idx => {
         name    = record.name
-        value = record.value
+        value   = record.value
         zone_id = record.zone_id
         proxied = record.proxied
         type    = record.type
       }
     }
   }
+}
+
+output "efs_file_system_id" {
+  description = "ID of the EFS filesystem (null when efs is disabled)"
+  value       = local.efs_enabled ? aws_efs_file_system.this[0].id : null
+}
+
+output "efs_access_point_id" {
+  description = "ID of the EFS access point (null when efs is disabled)"
+  value       = local.efs_enabled ? aws_efs_access_point.this[0].id : null
+}
+
+output "efs_security_group_id" {
+  description = "ID of the security group attached to the EFS mount targets (null when efs is disabled)"
+  value       = local.efs_enabled ? aws_security_group.efs[0].id : null
 }
