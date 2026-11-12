@@ -87,6 +87,9 @@ variable "service_connect" {
     port    = optional(number, 80)
     name    = optional(string, "service")
     timeout = optional(number, 15)
+    # Seconds a Service Connect proxy connection may stay idle before the proxy closes it (idleTimeoutSeconds).
+    # 0 disables it, which is what this module always set before.
+    idle_timeout = optional(number, 0)
     additional_ports = optional(list(object({
       name = string
       port = number
